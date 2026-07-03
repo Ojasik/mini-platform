@@ -20,11 +20,7 @@ jobs:
           username: ${{github.actor}}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
-        run: docker build -t __________ .
-
-      - name: Tag image
-        run: docker tag __________ __________
-
-      - name: Push image
-        run: docker push __________
+      - name: Build and push image
+        run: |
+            docker build -t ghcr.io/${{github.repository_owner}}/mini-platform:${{ github.sha }} . 
+            docker push ghcr.io/${{github.repository_owner}}/mini-platform:${{ github.sha }} 
