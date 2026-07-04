@@ -35,3 +35,12 @@ def redis_endpoint():
         return {"visits": value}
     except Exception as e:
         return {"error": str(e)}
+    
+@app.get("/ready")
+def ready():
+    try:
+        client = get_redis()
+        client.ping()
+        return {"status": "ready"}
+    except:
+        return {"status": "not ready"}, 503

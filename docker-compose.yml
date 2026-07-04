@@ -1,5 +1,8 @@
 services:
   api:
+    depends_on:
+      redis:
+        condition: service_healthy
     image: ghcr.io/ojasik/mini-platform:${IMAGE_TAG}
     ports:
       - "8080:8080"

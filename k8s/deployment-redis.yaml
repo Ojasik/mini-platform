@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mini-platform-redis
+  labels:
+    app: mini-platform-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mini-platform-redis
+  template:
+    metadata:
+      labels:
+        app: mini-platform-redis
+    spec:
+      containers:
+        - name: mini-platform-redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379

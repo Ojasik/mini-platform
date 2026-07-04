@@ -44,8 +44,8 @@ jobs:
           username: ${{github.actor}}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull and run the latest image
+      - name: Deploy to Kubernetes
         run: |
-            echo "IMAGE_TAG=${{ github.sha }}" > .env
-            docker compose pull
-            docker compose up -d
+            kubectl set image deployment/mini-platform-api mini-platform-api=ghcr.io/ojasik/mini-platform:${{ github.sha }}
+
+            kubectl rollout status deployment/mini-platform-api
