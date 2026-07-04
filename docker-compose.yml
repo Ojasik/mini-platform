@@ -3,8 +3,9 @@ services:
     image: ghcr.io/ojasik/mini-platform:${IMAGE_TAG}
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     networks:
       - mini-platform-network
     restart: unless-stopped
