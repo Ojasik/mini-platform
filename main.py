@@ -6,9 +6,11 @@ app = FastAPI()
 
 def get_redis():
     return redis.Redis(
-        host=os.getenv("REDIS_HOST"),
-        port=int(os.getenv("REDIS_PORT")),
+        host=os.getenv("REDIS_HOST", "redis"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
         decode_responses=True,
+        socket_connect_timeout=2,
+        socket_timeout=2,
     )
 
 @app.get("/health")
@@ -30,6 +32,6 @@ def redis_endpoint():
     try:
         client.incr("visits")
         value = client.get("visits")
-        return {"visits": value.decode()}
+        return {"visits": value}
     except Exception as e:
-        return {"error": "redis unavailable"}
+        return {"error": str(e)}
