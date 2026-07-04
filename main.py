@@ -1,25 +1,15 @@
 from fastapi import FastAPI
-import socket, os, redis, time
+import socket, os, redis
 
 app = FastAPI()
 
-def wait_for_redis():
-    for i in range(10):
-        try:
-            r = redis.Redis(
-                host=os.getenv("REDIS_HOST"),
-                port=int(os.getenv("REDIS_PORT")),
-            )
-            r.ping()
-            print("Redis is ready")
-            return r
-        except:
-            print("Waiting for Redis...")
-            time.sleep(1)
 
-    raise Exception("Redis not available")
-
-redis_client = wait_for_redis()
+def get_redis():
+    return redis.Redis(
+        host=os.getenv("REDIS_HOST"),
+        port=int(os.getenv("REDIS_PORT")),
+        decode_responses=True,
+    )
 
 @app.get("/health")
 def health():
@@ -35,5 +25,11 @@ def info():
 
 @app.get("/redis")
 def redis():
-    redis_client.incr("visits")
-    return {"visits": redis_client.get("visits").decode()}
+    client = get_redis()
+
+    try:
+        client.incr("visits")
+        value = client.get("visits")
+        return {"visits": value.decode()}
+    except Exception as e:
+        return {"error": "redis unavailable"}
