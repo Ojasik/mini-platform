@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/ojasik/mini-platform:latest
+    image: ghcr.io/ojasik/mini-platform:${IMAGE_TAG}
     ports:
       - "8080:8080"
     env_file:

@@ -46,6 +46,6 @@ jobs:
 
       - name: Pull and run the latest image
         run: |
-            docker compose down
-            docker compose pull 
+            echo "IMAGE_TAG=${{ github.sha }}" > .env
+            docker compose pull
             docker compose up -d
