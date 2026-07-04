@@ -24,7 +24,7 @@ def info():
     }
 
 @app.get("/redis")
-def redis():
+def redis_endpoint():
     client = get_redis()
 
     try:
