@@ -29,7 +29,7 @@ spec:
             - containerPort: 8080
           env:
             - name: REDIS_HOST
-              value: "redis"
+              value: "redis.default.svc.cluster.local"
             - name: REDIS_PORT
               value: "6379"
           readinessProbe:

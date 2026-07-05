@@ -6,7 +6,7 @@ app = FastAPI()
 
 def get_redis():
     return redis.Redis(
-        host=os.getenv("REDIS_HOST", "redis"),
+        host=os.getenv("REDIS_HOST", "redis.default.svc.cluster.local"),
         port=int(os.getenv("REDIS_PORT", 6379)),
         decode_responses=True,
         socket_connect_timeout=2,
