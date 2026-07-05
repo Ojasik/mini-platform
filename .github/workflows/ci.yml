@@ -46,7 +46,7 @@ jobs:
         
       - name: apply deployment to Kubernetes
         run: |
-            kubectl apply -f k8s/deployment-api.yaml
+            kubectl apply -f k8s/
 
       - name: Wait for deployment rollout
         run: |
