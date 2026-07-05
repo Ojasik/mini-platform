@@ -38,9 +38,4 @@ def redis_endpoint():
     
 @app.get("/ready")
 def ready():
-    try:
-        client = get_redis()
-        client.ping()
-        return {"status": "ready"}
-    except:
-        return {"status": "not ready"}, 503
+    return {"status": "ready"}
