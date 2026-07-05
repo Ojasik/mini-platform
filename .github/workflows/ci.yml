@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push:
+  ci:
     runs-on: self-hosted
 
     steps:
@@ -29,20 +29,20 @@ jobs:
             docker build -t ghcr.io/ojasik/mini-platform:${{ github.sha }} . 
             docker push ghcr.io/ojasik/mini-platform:${{ github.sha }} 
 
-  deploy:
-    needs: build-and-push
+  cd:
+    needs: ci
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GHCR
+      #   uses: docker/login-action@v4
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{github.actor}}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Kubernetes
         run: |
