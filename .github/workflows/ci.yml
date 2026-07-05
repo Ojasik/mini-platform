@@ -9,6 +9,9 @@ permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE: ghcr.io/ojasik/mini-platform
+
 jobs:
   ci:
     runs-on: self-hosted
@@ -26,26 +29,25 @@ jobs:
 
       - name: Build and push image
         run: |
-            docker build -t ghcr.io/ojasik/mini-platform:${{ github.sha }} . 
-            docker push ghcr.io/ojasik/mini-platform:${{ github.sha }} 
+            docker build -t ${IMAGE}:${{ github.sha }} . 
+            docker push ${IMAGE}:${{ github.sha }} 
 
   cd:
     needs: ci
     runs-on: self-hosted
 
     steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # - name: Login to GHCR
-      #   uses: docker/login-action@v4
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{github.actor}}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy to Kubernetes
+      - name: Set image tag in deployment file
         run: |
-            kubectl set image deployment/mini-platform-api mini-platform-api=ghcr.io/ojasik/mini-platform:${{ github.sha }}
+            sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/deployment-api.yaml
+        
+      - name: apply deployment to Kubernetes
+        run: |
+            kubectl apply -f k8s/deployment-api.yaml
 
+      - name: Wait for deployment rollout
+        run: |
             kubectl rollout status deployment/mini-platform-api
