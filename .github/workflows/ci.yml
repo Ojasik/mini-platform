@@ -32,6 +32,18 @@ jobs:
             docker build -t ${IMAGE}:${{ github.sha }} . 
             docker push ${IMAGE}:${{ github.sha }} 
 
+      - name: Update kubernetes manifests with new image tag
+        run: |
+            sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/deployment-api.yaml
+
+      - name: Commit manifest update
+        run: |
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add k8s/deployment-api.yaml
+            git commit -m "Update deployment manifest with ${{ github.sha }}" || exit 0
+            git push
+
   cd:
     needs: ci
     runs-on: self-hosted
