@@ -44,22 +44,22 @@ jobs:
             git commit -m "Update deployment manifest with ${{ github.sha }}" || exit 0
             git push
 
-  cd:
-    needs: ci
-    runs-on: self-hosted
+  # cd:
+  #   needs: ci
+  #   runs-on: self-hosted
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set image tag in deployment file
-        run: |
-            sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/deployment-api.yaml
+  #     - name: Set image tag in deployment file
+  #       run: |
+  #           sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/deployment-api.yaml
         
-      - name: apply deployment to Kubernetes
-        run: |
-            kubectl apply -f k8s/
+  #     - name: apply deployment to Kubernetes
+  #       run: |
+  #           kubectl apply -f k8s/
 
-      - name: Wait for deployment rollout
-        run: |
-            kubectl rollout status deployment/mini-platform-api
+  #     - name: Wait for deployment rollout
+  #       run: |
+  #           kubectl rollout status deployment/mini-platform-api
