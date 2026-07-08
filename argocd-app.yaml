@@ -9,7 +9,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/Ojasik/mini-platform.git
+    repoURL: https://github.com/Ojasik/mini-platform-infra.git
     targetRevision: main
     path: k8s
 
