@@ -27,11 +27,9 @@ spec:
               cpu: "500m"
           ports:
             - containerPort: 8080
-          env:
-            - name: REDIS_HOST
-              value: "redis.default.svc.cluster.local"
-            - name: REDIS_PORT
-              value: "6379"
+          envFrom:
+            - configMapRef:
+                name: mini-platform-config
           readinessProbe:
             httpGet: 
               path: /ready
