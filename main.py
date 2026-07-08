@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import socket, os, redis
 
 app = FastAPI()
@@ -6,7 +6,7 @@ app = FastAPI()
 
 def get_redis():
     return redis.Redis(
-        host=os.getenv("REDIS_HOST", "redis.default.svc.cluster.local"),
+        host=os.getenv("REDIS_HOST", "redis"),
         port=int(os.getenv("REDIS_PORT", 6379)),
         decode_responses=True,
         socket_connect_timeout=2,
@@ -33,9 +33,25 @@ def redis_endpoint():
         client.incr("visits")
         value = client.get("visits")
         return {"visits": value}
-    except Exception as e:
-        return {"error": str(e)}
+    
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail="Redis unavailable"
+        )
     
 @app.get("/ready")
 def ready():
-    return {"status": "ready"}
+    try:
+        client = get_redis()
+        client.ping()
+
+        return {
+            "status": "ready"
+        }
+
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail="Redis unavailable"
+        )
