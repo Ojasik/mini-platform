@@ -5,7 +5,7 @@ metadata:
   labels:
     app: mini-platform-redis
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: mini-platform-redis
