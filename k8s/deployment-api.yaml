@@ -17,7 +17,7 @@ spec:
       containers:
         - name: mini-platform-api
           imagePullPolicy: Always
-          image: ghcr.io/ojasik/mini-platform:27d864458ae8d48b919bb159b968f32b45af7bb2
+          image: ghcr.io/ojasik/mini-platform:b6902227798705585706c1378383b238ad62cc39
           resources:
             requests:
               memory: "64Mi"
