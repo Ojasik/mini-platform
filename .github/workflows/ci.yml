@@ -45,11 +45,13 @@ jobs:
           path: infra
 
       - name: Update Helm image tag
+        uses: mikefarah/yq@v4.52.2
         env:
           IMAGE_TAG: ${{ github.sha }}
-        run: |
-          yq -i \
-            '.api.image.tag = strenv(IMAGE_TAG)' \
+        with:
+          cmd: >
+            yq -i
+            '.api.image.tag = strenv(IMAGE_TAG)'
             infra/helm/mini-platform/values.yaml
 
       - name: Commit infrastructure change
