@@ -37,19 +37,35 @@ jobs:
           $IMAGE:${{ github.sha }}
 
 
-      - name: Update infra repo
+      - name: Checkout infrastructure repository
+        uses: actions/checkout@v4
+        with:
+          repository: Ojasik/mini-platform-infra
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra
+
+      - name: Update Helm image tag
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          git clone https://x-access-token:${{ secrets.INFRA_TOKEN }}@github.com/Ojasik/mini-platform-infra.git
+          yq -i \
+            '.api.image.tag = strenv(IMAGE_TAG)' \
+            infra/helm/mini-platform/values.yaml
 
-          cd mini-platform-infra
+      - name: Commit infrastructure change
+        working-directory: infra
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          sed -i "s#${IMAGE}:.*#${IMAGE}:${{ github.sha }}#" k8s/deployment-api.yaml
+          git add helm/mini-platform/values.yaml
 
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
+          if git diff --cached --quiet; then
+            echo "Image tag has not changed"
+            exit 0
+          fi
 
-          git add k8s/deployment-api.yaml
+          git commit \
+            -m "Deploy mini-platform ${{ github.sha }}"
 
-          git commit -m "Update image tag ${{ github.sha }} [skip ci]" || exit 0
-
-          git push
+          git push origin HEAD:main
