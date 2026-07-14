@@ -21,7 +21,7 @@ def health():
 def info():
     return {
         "service": "mini-platform",
-        "version": "0.1",
+        "version": "0.2",
         "hostname": socket.gethostname()
     }
 
