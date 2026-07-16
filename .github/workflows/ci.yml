@@ -19,23 +19,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-
       - name: Login GHCR
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         run: |
           docker build \
-          -t $IMAGE:${{ github.sha }} .
+          -t "$IMAGE:${{ github.sha }}" .
 
           docker push \
-          $IMAGE:${{ github.sha }}
-
+          "$IMAGE:${{ github.sha }}"
 
       - name: Checkout infrastructure repository
         uses: actions/checkout@v4
@@ -43,6 +40,11 @@ jobs:
           repository: Ojasik/mini-platform-infra
           token: ${{ secrets.INFRA_TOKEN }}
           path: infra
+
+      - name: Install Helm
+        uses: azure/setup-helm@v5.0.0
+        with:
+          version: v3.18.4
 
       - name: Update Helm image tag
         uses: mikefarah/yq@v4.52.2
@@ -54,6 +56,35 @@ jobs:
             '.api.image.tag = strenv(IMAGE_TAG)'
             infra/helm/mini-platform/values.yaml
 
+      - name: Validate Helm chart
+        env: 
+          EXPECTED_IMAGE: ${{ env.IMAGE }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          CHART_DIR="infra/helm/mini-platform"
+          RENDERED_FILE="/tmp/mini-platform-rendered.yaml"
+
+          rm -f "$RENDERED_FILE"
+
+          helm version
+          helm lint "$CHART_DIR"
+
+          helm template mini-platform "$CHART_DIR" > "$RENDERED_FILE"
+
+          $RENDERED_IMAGE_LINES=$(grep -F 'image:' "$RENDERED_FILE" || true)
+
+          echo "Rendered Helm chart images:"
+          echo "$RENDERED_IMAGE_LINES"
+
+          if ! grep -Fq "$EXPECTED_IMAGE" <<< "$RENDERED_IMAGE_LINES"; then
+            echo "Rendered Helm chart does not contain the expected image tag"
+            echo "Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+
+          echo "Rendered Helm chart contains the expected image tag: $EXPECTED_IMAGE"
+        
       - name: Commit infrastructure change
         working-directory: infra
         run: |
