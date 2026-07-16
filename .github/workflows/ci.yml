@@ -72,7 +72,7 @@ jobs:
 
           helm template mini-platform "$CHART_DIR" > "$RENDERED_FILE"
 
-          $RENDERED_IMAGE_LINES=$(grep -F 'image:' "$RENDERED_FILE" || true)
+          RENDERED_IMAGE_LINES=$(grep -F 'image:' "$RENDERED_FILE" || true)
 
           echo "Rendered Helm chart images:"
           echo "$RENDERED_IMAGE_LINES"
